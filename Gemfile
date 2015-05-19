@@ -3,3 +3,9 @@ source "https://rubygems.org"
 
 # gem "rails"
 gem "sinatra"
+gem 'rack-test'
+#gem 'minitest'
+gem 'test-unit'
+
+gem 'guard'
+gem 'guard-minitest'
