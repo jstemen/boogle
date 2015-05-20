@@ -16,6 +16,7 @@ class AppTest < Test::Unit::TestCase
   def query_index(query)
     get '/search', {query: query}
     assert last_response.ok?
+    last_response.body
   end
 
   def load_index_with_book(page_content, page_id=300)
@@ -31,29 +32,42 @@ class AppTest < Test::Unit::TestCase
     load_index_with_book("Elementary, dear Watson")
 
     query_index('dear Watson')
-    res = {matches: {pageId: '300', score: 2}}.to_json
+    res = {matches: [{pageId: '300', score: 2}]}.to_json
     assert_equal res, last_response.body
 
   end
 
   def test_querries_are_case_insenitive
-    skip "Implement me"
+    content = "Elementary dear Watson"
+    load_index_with_book(content)
+
+    res_one = query_index(content)
+    res_two = query_index(content.upcase)
+
+    assert_equal res_one, res_two
   end
 
   def test_that_puncutation_is_ignored
-    skip "Implement me"
+    content = "Elementar&y de:ar Wa,tson"
+    load_index_with_book(content)
+
+    res_one = query_index(content)
+    sanitized_query = content.gsub(/[^0-9A-Za-z ]/, '')
+    res_two = query_index(sanitized_query)
+    refute_empty JSON.parse(res_one)['matches']
+    assert_equal res_one, res_two
   end
 
   def test_that_querries_disreguard_order
-    skip "Implement me"
+    omit "Implement me"
   end
 
   def test_that_querries_disreguard_word_frequency
-    skip "Implement me"
+    omit "Implement me"
   end
 
   def test_that_partial_matches_work
-    skip "Implement me"
+    omit "Implement me"
   end
 
 end

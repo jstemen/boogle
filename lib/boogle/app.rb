@@ -30,16 +30,38 @@ Content-Type: application/json
 =end
 get '/search' do
   query = params['query']
-  page_ids = Set.new
+  page_ids = []
   query.split(' ').each { |q_word|
-    WORD_MAP[q_word].each { |page_id|
-      page_ids << page_id
-    }
+    sanitized_q_word = q_word.gsub(/[^0-9A-Za-z ]/, '').downcase
+    match = WORD_MAP[sanitized_q_word]
+    if match
+      match.each { |page_id|
+        page_ids << page_id
+      }
+    end
   }
-  matches = {}
+
+  page_ids.sort!
+
+  cur_id = page_ids.first
+  dup_count = 0
+  id_to_sum_map = {}
   page_ids.each { |page_id|
-    matches[:pageId] = page_id
-    matches[:score] =1
+    if cur_id == page_id
+      dup_count +=1
+    else
+      id_to_sum_map[page_id] = dup_count
+      dup_count = 1
+    end
+  }
+  id_to_sum_map[cur_id] = dup_count if cur_id
+
+
+  matches = id_to_sum_map.collect { |page_id, sum_count|
+    sub_map = {}
+    sub_map[:pageId] = page_id
+    sub_map[:score] = sum_count
+    sub_map
   }
   my_bod = {matches: matches}.to_json
   [200, {'Content-Type' => 'application/json'}, my_bod]
