@@ -44,7 +44,7 @@ class AppTest < Test::Unit::TestCase
     res_one = query_index(content)
     res_two = query_index(content.upcase)
 
-    assert_equal res_one, res_two
+    assert_responses_equal_and_not_empty res_one, res_two
   end
 
   def test_that_puncutation_is_ignored
@@ -54,8 +54,12 @@ class AppTest < Test::Unit::TestCase
     res_one = query_index(content)
     sanitized_query = content.gsub(/[^0-9A-Za-z ]/, '')
     res_two = query_index(sanitized_query)
-    refute_empty JSON.parse(res_one)['matches']
-    assert_equal res_one, res_two
+    assert_responses_equal_and_not_empty res_one, res_two
+  end
+
+  def assert_responses_equal_and_not_empty(response_one, response_two)
+    refute_empty JSON.parse(response_one)['matches']
+    assert_equal response_one, response_two
   end
 
   def test_that_querries_disreguard_order

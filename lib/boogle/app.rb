@@ -5,6 +5,10 @@ require 'json'
 # word => [page_id, page_id]
 WORD_MAP = {}
 
+def sanitize_word(word)
+  word.gsub(/[^0-9A-Za-z ]/, '').downcase
+end
+
 =begin
 # Endpoint to handle searching
 GET /search?query=Elementary,%20dear%20Watson
@@ -32,8 +36,7 @@ get '/search' do
   query = params['query']
   page_ids = []
   query.split(' ').each { |q_word|
-    sanitized_q_word = q_word.gsub(/[^0-9A-Za-z ]/, '').downcase
-    match = WORD_MAP[sanitized_q_word]
+    match = WORD_MAP[sanitize_word(q_word)]
     if match
       match.each { |page_id|
         page_ids << page_id
@@ -81,8 +84,9 @@ post '/index' do
   page_id = params['pageId']
   content = params['content']
   content.split(' ').each { |word|
-    WORD_MAP[word] ||= []
-    WORD_MAP[word] << page_id
+    san_word = sanitize_word(word)
+    WORD_MAP[san_word] ||= []
+    WORD_MAP[san_word] << page_id
   }
 
 end
