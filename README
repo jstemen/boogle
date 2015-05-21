@@ -1,0 +1,10 @@
+Starting the app
+0) Run bundle
+1) Navigate to boogle/lib/boogle
+2) Run rackup
+
+Testing the app
+0) Run bundle
+1) Run bundle exec guard
+
+See Boogle.docx for description of problem this app solves
