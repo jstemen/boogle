@@ -12,6 +12,9 @@ class AppTest < Test::Unit::TestCase
     Sinatra::Application
   end
 
+  def teardown
+    WORD_MAP.clear
+  end
 
   def query_index(query)
     get '/search', {query: query}
@@ -72,6 +75,15 @@ class AppTest < Test::Unit::TestCase
     load_index_with_book("Elementary, dear Watson")
     res = query_index('dear Watson')
     expected = {matches: [{pageId: '300', score: 2}]}.to_json
+    assert_equal expected, res
+  end
+
+  def test_that_matches_are_sorted_by_score
+    load_index_with_book("Elementary dear Watson", 3)
+    load_index_with_book("Elementary", 1)
+    load_index_with_book("Elementary dear", 2)
+    res = query_index('Elementary dear Watson')
+    expected = {matches: [{pageId: '3', score: 3},{pageId: '2', score: 2}, {pageId: '1', score: 1}]}.to_json
     assert_equal expected, res
   end
 

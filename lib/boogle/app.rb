@@ -44,23 +44,27 @@ get '/search' do
     end
   }
 
-  page_ids.sort!
-
-  cur_id = page_ids.first
-  dup_count = 0
+  page_ids.sort!.reverse!
   id_to_sum_map = {}
-  page_ids.each { |page_id|
-    if cur_id == page_id
-      dup_count +=1
-    else
-      id_to_sum_map[page_id] = dup_count
-      dup_count = 1
-    end
-  }
-  id_to_sum_map[cur_id] = dup_count if cur_id
+  unless page_ids.empty?
+    past_id = page_ids[0]
+    dup_count = 1
+    (1..page_ids.size-1).to_a.each { |i|
+      cur_id = page_ids[i]
+      if past_id == cur_id
+        dup_count +=1
+      else
+        id_to_sum_map[past_id] = dup_count
+        dup_count = 1
+        past_id = cur_id
+      end
+    }
+    id_to_sum_map[past_id] = dup_count
+  end
 
 
   matches = id_to_sum_map.collect { |page_id, sum_count|
+
     sub_map = {}
     sub_map[:pageId] = page_id
     sub_map[:score] = sum_count
