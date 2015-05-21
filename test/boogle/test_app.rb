@@ -1,6 +1,6 @@
 ENV['RACK_ENV'] = 'test'
 
-require_relative '../../lib/boogle/app'
+require_relative '../../lib/boogle/simple_app'
 require 'test/unit'
 require 'rack/test'
 
@@ -9,11 +9,11 @@ class AppTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
   def app
-    Sinatra::Application
+    SimpleApp
   end
 
   def teardown
-    WORD_MAP.clear
+    SimpleApp::WORD_MAP.clear
   end
 
   def query_index(query)
