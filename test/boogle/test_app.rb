@@ -13,22 +13,7 @@ class AppTest < Test::Unit::TestCase
   end
 
   def teardown
-    SimpleApp::WORD_MAP.clear
-  end
-
-  def query_index(query)
-    get '/search', {query: query}
-    assert last_response.ok?
-    last_response.body
-  end
-
-  def load_index_with_book(page_content, page_id=300)
-    body = {
-        pageId: page_id,
-        content: page_content
-    }
-    post '/index', body
-    assert last_response.ok?
+    delete '/index'
   end
 
   def test_querries_are_case_insenitive
@@ -78,13 +63,36 @@ class AppTest < Test::Unit::TestCase
     assert_equal expected, res
   end
 
+  def test_that_no_matches_work
+    load_index_with_book("Elementary, dear Watson")
+    res = query_index('foobar')
+    expected = {matches: []}.to_json
+    assert_equal expected, res
+  end
+
   def test_that_matches_are_sorted_by_score
     load_index_with_book("Elementary dear Watson", 3)
     load_index_with_book("Elementary", 1)
     load_index_with_book("Elementary dear", 2)
     res = query_index('Elementary dear Watson')
-    expected = {matches: [{pageId: '3', score: 3},{pageId: '2', score: 2}, {pageId: '1', score: 1}]}.to_json
+    expected = {matches: [{pageId: '3', score: 3}, {pageId: '2', score: 2}, {pageId: '1', score: 1}]}.to_json
     assert_equal expected, res
+  end
+
+  private
+  def query_index(query)
+    get '/search', {query: query}
+    assert last_response.ok?
+    last_response.body
+  end
+
+  def load_index_with_book(page_content, page_id=300)
+    body = {
+        pageId: page_id,
+        content: page_content
+    }
+    post '/index', body
+    assert last_response.ok?
   end
 
 end
