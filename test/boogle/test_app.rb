@@ -28,15 +28,6 @@ class AppTest < Test::Unit::TestCase
     assert last_response.ok?
   end
 
-  def test_it_can_consume_and_respond
-    load_index_with_book("Elementary, dear Watson")
-
-    query_index('dear Watson')
-    res = {matches: [{pageId: '300', score: 2}]}.to_json
-    assert_equal res, last_response.body
-
-  end
-
   def test_querries_are_case_insenitive
     content = "Elementary dear Watson"
     load_index_with_book(content)
@@ -63,15 +54,25 @@ class AppTest < Test::Unit::TestCase
   end
 
   def test_that_querries_disreguard_order
-    omit "Implement me"
+    content = "Elementary dear Watson"
+    load_index_with_book(content)
+    res_one = query_index("Watson Elementary dear ")
+    res_two = query_index(content)
+    assert_responses_equal_and_not_empty res_one, res_two
   end
 
   def test_that_querries_disreguard_word_frequency
-    omit "Implement me"
+    load_index_with_book("Elementary, dear Watson" * 10)
+    res = query_index('dear Watson')
+    expected = {matches: [{pageId: '300', score: 2}]}.to_json
+    assert_equal expected, res
   end
 
   def test_that_partial_matches_work
-    omit "Implement me"
+    load_index_with_book("Elementary, dear Watson")
+    res = query_index('dear Watson')
+    expected = {matches: [{pageId: '300', score: 2}]}.to_json
+    assert_equal expected, res
   end
 
 end

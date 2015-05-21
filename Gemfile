@@ -8,4 +8,5 @@ gem 'rack-test'
 gem 'test-unit'
 
 gem 'guard'
-gem 'guard-minitest'
+gem 'guard-test'
+gem 'ruby_gntp'

@@ -85,7 +85,7 @@ post '/index' do
   content = params['content']
   content.split(' ').each { |word|
     san_word = sanitize_word(word)
-    WORD_MAP[san_word] ||= []
+    WORD_MAP[san_word] ||= Set.new
     WORD_MAP[san_word] << page_id
   }
 
